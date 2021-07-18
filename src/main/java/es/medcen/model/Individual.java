@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -18,21 +19,21 @@ public class Individual implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	private int id;
+	private Long id;
 	
-	@NotNull
-	@Column(name = "id_card", unique = true)
+	@Column(name = "id_card", unique = true, nullable = false)
 	private String idCard;
 	
+	@Column(nullable = false)
 	private String name;
+	@Column(nullable = false)
 	private String surname;
 	
 	@Column(name = "birth_date", columnDefinition="DATE")
 	@Temporal(TemporalType.DATE)
 	private Date birthDate;
 	
-	@Column(name = "phone_number")
+	@Column(name = "phone_number", nullable = false)
 	private String phoneNumber;
 	
 	private String address;
@@ -41,4 +42,10 @@ public class Individual implements Serializable{
 	private String postalCode;
 	
 	private String email;
+	
+	@OneToOne(mappedBy= "individual")
+	private Patient patient;
+	
+	@OneToOne(mappedBy= "individual")
+	private HealthWorker healthWorker;
 }
