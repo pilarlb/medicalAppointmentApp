@@ -34,10 +34,20 @@ public class HealthWorker implements Serializable {
 	@Column(name="procurement_date")
 	private Date procurementDate;
 	
-	//relacion unidireccional
+	//relacion unidireccional ---ESPECIALIDADES
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name="health_specialties")
-	private List<HealthSpecialties> healthSpecialties;
+	private List<HealthSpecialty> healthSpecialties;
+	
+	//bidireccional: muchos horarios diarios
+	@OneToMany(mappedBy="healthWorker",cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name="schedules")
+	private List<Schedule> schedules;
+	
+	//Bidirecciional:Un doctor, muchas citas
+	@OneToMany(mappedBy="healthWorker",cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name="appointments")
+	private List<Appointment> appointments;
 	
 	
 }

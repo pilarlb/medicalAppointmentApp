@@ -43,9 +43,10 @@ public class Individual implements Serializable{
 	
 	private String email;
 	
+	//side of no FK
 	@OneToOne(mappedBy= "individual")
 	private Patient patient;
-	
+	//side of no FK
 	@OneToOne(mappedBy= "individual")
 	private HealthWorker healthWorker;
 }
