@@ -1,6 +1,7 @@
 package es.medcen.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -21,11 +22,16 @@ import javax.persistence.Table;
 public class Schedule implements Serializable{
 	/**
 	 * Horario por dia del doctor
+	 * -ID
+	 * -FECHA/DATE
+	 * -IS_WORKING_DAY
+	 * -ID_DOCTOR
+	 * -LISTA_SLOTS
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+	@Column(nullable = false)
 	private Calendar date;
 	
 	@Column(name = "is_working_day")
@@ -35,10 +41,101 @@ public class Schedule implements Serializable{
 	@ManyToOne(fetch = FetchType.LAZY)
     private HealthWorker healthWorker;
 	
+	/*
+	 * oneToMany bidireccional: metodos a implementar
+	 * - En el padre (one) addComment y removeComment
+	 * - en el hijo (many) equals y hashCode
+	 */
 	//bidireccional REVISAR orphanRemoval
 	@OneToMany(mappedBy="schedule",cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name="slots")
-	private List<Slot> slots;
+	private List<Slot> slots= new ArrayList<>();
+
+	
+	//CONSTRUCTOR
+	public Schedule() {
+		super();
+	}
+	
+	
+	public Schedule(Calendar date, boolean isWorkingDay, HealthWorker healthWorker, List<Slot> slots) {
+		super();
+		this.date = date;
+		this.isWorkingDay = isWorkingDay;
+		this.healthWorker = healthWorker;
+		this.slots = slots;
+	}
+	
+	/*
+	 * METHODS FOR ADDING AND REMOVING SLOTS
+	 */
+
+	public void addSlot(Slot slot){
+		slots.add(slot);
+		slot.setSchedule(this);
+	
+	}
+	public void removeSlot(Slot slot){
+		slots.remove(slot);
+		slot.setSchedule(null);
+	
+	}
+	
+	
+	
+	//EQUALS AND HASHCODE
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();	
+	}
+
+	@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Schedule )) return false;
+        return id != null && id.equals(((Schedule) o).getId());
+    }
+
+
+	//GETTERS AND SETTERS
+	public Calendar getDate() {
+		return date;
+	}
+
+	public void setDate(Calendar date) {
+		this.date = date;
+	}
+
+	public boolean isWorkingDay() {
+		return isWorkingDay;
+	}
+
+	public void setWorkingDay(boolean isWorkingDay) {
+		this.isWorkingDay = isWorkingDay;
+	}
+
+	public HealthWorker getHealthWorker() {
+		return healthWorker;
+	}
+
+	public void setHealthWorker(HealthWorker healthWorker) {
+		this.healthWorker = healthWorker;
+	}
+
+	public List<Slot> getSlots() {
+		return slots;
+	}
+
+	public void setSlots(List<Slot> slots) {
+		this.slots = slots;
+	}
+
+	public Long getId() {
+		return id;
+	}
+	
+	
+	
 	
 	
 }
