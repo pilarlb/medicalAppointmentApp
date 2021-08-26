@@ -1,4 +1,4 @@
-package es.medcen.model;
+package es.medcen.app.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,6 +20,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name="schedules")
 public class Schedule implements Serializable{
+	
+	
+	private static final long serialVersionUID = -5606623658012630380L;
+	
 	/**
 	 * Horario por dia del doctor
 	 * -ID

@@ -1,9 +1,11 @@
-package es.medcen.model;
+package es.medcen.app.model;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +18,8 @@ import javax.persistence.Table;
 @Table(name="slots")
 public class Slot implements Serializable{
 	
+	private static final long serialVersionUID = 3397184904070958210L;
+
 	/**
 	 * Lista de slots/horas disponibles
 	 * -ID
@@ -27,9 +31,10 @@ public class Slot implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	//Ojo he puesto strings, podrian ser int
+	
 	@Column(name = "appointment_time",nullable = false)
-	private String appointmentTime;
+	@Enumerated(EnumType.STRING)
+	private AppointmentTime appointmentTime;
 	
 	private boolean available;
 	
@@ -48,25 +53,40 @@ public class Slot implements Serializable{
 	public Slot() {
 		super();
 	}
-	public Slot(String appointmentTime, boolean available, Appointment appointment, Schedule schedule) {
+	public Slot(AppointmentTime appointmentTime, boolean available, Appointment appointment, Schedule schedule) {
 		super();
 		this.appointmentTime = appointmentTime;
 		this.available = available;
 		this.appointment = appointment;
 		this.schedule = schedule;
 	}
+	
+	//EQUALS AND HASHCODE
+		@Override
+		public int hashCode() {
+			return getClass().hashCode();	
+		}
+
+		@Override
+	    public boolean equals(Object o) {
+	        if (this == o) return true;
+	        if (!(o instanceof Slot )) return false;
+	        return id != null && id.equals(((Slot) o).getId());
+	    }
+	
 	//GETTERS AND SETTERS
 	public Long getId() {
 		return id;
 	}
-	public String getAppointmentTime() {
+	
+
+	public AppointmentTime getAppointmentTime() {
 		return appointmentTime;
 	}
-
-	public void setAppointmentTime(String appointmentTime) {
+	public void setAppointmentTime(AppointmentTime appointmentTime) {
 		this.appointmentTime = appointmentTime;
 	}
-
+	
 	public boolean isAvailable() {
 		return available;
 	}

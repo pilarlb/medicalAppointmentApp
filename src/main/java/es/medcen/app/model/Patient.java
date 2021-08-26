@@ -1,4 +1,4 @@
-package es.medcen.model;
+package es.medcen.app.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -26,6 +25,11 @@ public class Patient  extends Individual implements Serializable {
 	 * - en el hijo (many) equals y hashCode
 	 */
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5900846760787103371L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

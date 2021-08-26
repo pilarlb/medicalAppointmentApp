@@ -1,4 +1,4 @@
-package es.medcen.model;
+package es.medcen.app.model;
 
 /**
  * 

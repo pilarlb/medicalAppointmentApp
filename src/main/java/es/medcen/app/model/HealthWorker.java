@@ -1,4 +1,4 @@
-package es.medcen.model;
+package es.medcen.app.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,6 +19,12 @@ import javax.persistence.Table;
 @Table(name="health_workers")
 public class HealthWorker extends Individual implements Serializable {
 	
+	/**
+	 * HealthWorker hereda de individual
+	 */
+	private static final long serialVersionUID = 6317182174856851446L;
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -76,7 +82,7 @@ public class HealthWorker extends Individual implements Serializable {
 	public void addHealthSpecialty(HealthSpecialty healthspecialty){
 		healthSpecialties.add(healthspecialty);
 		healthspecialty.setHealthworker(this);
-	
+	                         
 	}
 	public void removeHealthSpecialty(HealthSpecialty healthspecialty){
 		healthSpecialties.remove(healthspecialty);

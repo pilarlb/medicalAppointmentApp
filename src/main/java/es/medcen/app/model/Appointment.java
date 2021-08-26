@@ -1,7 +1,6 @@
-package es.medcen.model;
+package es.medcen.app.model;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,6 +18,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name="appointments")
 public class Appointment implements Serializable{
+	
+ 
+	private static final long serialVersionUID = -2715960671928715496L;
+
+
 	/**
 	 * Citas: el horario de los medicos
 	 * hay muchas citas asignadas a un dia de horario
