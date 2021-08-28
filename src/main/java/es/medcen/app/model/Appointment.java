@@ -32,7 +32,7 @@ public class Appointment implements Serializable{
 	 * -NOTES
 	 * -id_doctor
 	 * -id_patient
-	 * -id_day_schedule
+	 * -id_day_schedule --- quitado, duda
 	 * -id_slot
 	 */
 	
@@ -48,8 +48,9 @@ public class Appointment implements Serializable{
 	//Notas, observaciones sobre la cita
 	private String notes;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Schedule schedule;
+	//GRAN DUDA SI VINCULAR CON HORARIO
+	//@ManyToOne(fetch = FetchType.LAZY)
+	//private Schedule schedule;
 	
 	//Relacion uno a uno: una cita, un slot
 	@OneToOne(cascade = CascadeType.ALL)
