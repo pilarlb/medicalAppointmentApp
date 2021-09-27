@@ -52,7 +52,7 @@ public class Schedule implements Serializable{
 	 */
 	//bidireccional REVISAR orphanRemoval
 	@OneToMany(mappedBy="schedule",cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name="slots")
+	//@JoinColumn(name="slots")
 	private List<Slot> slots= new ArrayList<>();
 
 	

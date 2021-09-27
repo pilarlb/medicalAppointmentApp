@@ -48,12 +48,12 @@ public class HealthWorker extends Individual implements Serializable {
 	
 	//bidireccional: muchos horarios diarios
 	@OneToMany(mappedBy="healthWorker",cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name="schedules")
+	//@JoinColumn(name="schedules")
 	private List<Schedule> schedules = new ArrayList<>();
 	
 	//Bidirecciional:Un doctor, muchas citas
 	@OneToMany(mappedBy="healthWorker",cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name="appointments")
+	//@JoinColumn(name="appointments")
 	private List<Appointment> appointments = new ArrayList<>();
 	
 	

@@ -71,12 +71,11 @@ public class Appointment implements Serializable{
 		super();
 	}
 	
-	public Appointment(Status status, String notes, Schedule schedule, Slot slot, HealthWorker healthWorker,
+	public Appointment(Status status, String notes, Slot slot, HealthWorker healthWorker,
 			Patient patient) {
 		super();
 		this.status = status;
 		this.notes = notes;
-		this.schedule = schedule;
 		this.slot = slot;
 		this.healthWorker = healthWorker;
 		this.patient = patient;
@@ -123,13 +122,6 @@ public class Appointment implements Serializable{
 		this.notes = notes;
 	}
 
-	public Schedule getSchedule() {
-		return schedule;
-	}
-
-	public void setSchedule(Schedule schedule) {
-		this.schedule = schedule;
-	}
 
 	public Slot getSlot() {
 		return slot;

@@ -42,7 +42,7 @@ public class Patient  extends Individual implements Serializable {
 	
 	//relacion unidireccional REVISAR orphanRemoval
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name="appointments")
+	//@JoinColumn(name="appointments")
 	private List<Appointment> appointments = new ArrayList<>();
 
 	
