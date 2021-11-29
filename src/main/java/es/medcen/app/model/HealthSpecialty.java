@@ -5,6 +5,8 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -20,6 +22,7 @@ public class HealthSpecialty implements Serializable {
 	private static final long serialVersionUID = 7042526046437066991L;
 
 		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		private Long id;
 		
 		@Column(nullable = false)
@@ -40,6 +43,9 @@ public class HealthSpecialty implements Serializable {
 			this.specialty = specialty;
 			this.healthworker = healthworker;
 		}
+		
+		
+		
 		//EQUALS AND HASHCODE
 		@Override
 		public int hashCode() {

@@ -48,10 +48,7 @@ public class Appointment implements Serializable{
 	//Notas, observaciones sobre la cita
 	private String notes;
 	
-	//GRAN DUDA SI VINCULAR CON HORARIO
-	//@ManyToOne(fetch = FetchType.LAZY)
-	//private Schedule schedule;
-	
+
 	//Relacion uno a uno: una cita, un slot
 	@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "slot")
@@ -96,7 +93,12 @@ public class Appointment implements Serializable{
         if (!(o instanceof Appointment )) return false;
         return id != null && id.equals(((Appointment) o).getId());
     }
-
+	
+	@Override
+	public String toString() {
+		return "Appointment [id=" + id + ", status=" + status + ", notes=" + notes + ", slot=" + slot
+				+ ", healthWorker=" + healthWorker + ", patient=" + patient + "]";
+	}
 	//GETTERS AND SETTERS
 	
 	

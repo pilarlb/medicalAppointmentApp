@@ -61,7 +61,12 @@ public class Slot implements Serializable{
 		this.schedule = schedule;
 	}
 	
-	//EQUALS AND HASHCODE
+	@Override
+	public String toString() {
+		return "Slot [id=" + id + ", appointmentTime=" + appointmentTime + ", available=" + available + ", appointment="
+				+ appointment + ", schedule=" + schedule + "]";
+	}
+		//EQUALS AND HASHCODE
 		@Override
 		public int hashCode() {
 			return getClass().hashCode();	

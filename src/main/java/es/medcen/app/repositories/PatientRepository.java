@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
 	List<Patient> findBySurnameContaining (String surname);
+	Patient findByIdCardContaining (String idcard);
 }

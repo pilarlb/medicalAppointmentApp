@@ -70,9 +70,18 @@ public class Schedule implements Serializable{
 		this.slots = slots;
 	}
 	
+	@Override
+	public String toString() {
+		return "Schedule [id=" + id + ", date=" + date + ", isWorkingDay=" + isWorkingDay + ", healthWorker="
+				+ healthWorker + ", slots=" + slots + "]";
+	}
+
+	
 	/*
 	 * METHODS FOR ADDING AND REMOVING SLOTS
 	 */
+
+	
 
 	public void addSlot(Slot slot){
 		slots.add(slot);

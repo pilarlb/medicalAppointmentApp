@@ -36,6 +36,14 @@ public class HealthWorker extends Individual implements Serializable {
 	@Column(name="procurement_date")
 	private Date procurementDate;
 	
+	
+	@Override
+	public String toString() {
+		return "HealthWorker [id=" + id + ", practicingFrom=" + practicingFrom + ", procurementDate=" + procurementDate
+				+ ", healthSpecialties=" + healthSpecialties + ", schedules=" + schedules + ", appointments="
+				+ appointments + "]";
+	}
+
 	/*
 	 * oneToMany bidireccional: metodos a implementar
 	 * - En el padre (one) addComment y removeComment

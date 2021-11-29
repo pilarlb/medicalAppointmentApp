@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -66,6 +65,12 @@ public class Patient  extends Individual implements Serializable {
 		this.appointments = appointments;
 	}
 	
+	@Override
+	public String toString() {
+		return "Patient [id=" + id + ", hasInsurance=" + hasInsurance + ", insuranceCompany=" + insuranceCompany
+				+ ", appointments=" + appointments + "]";
+	}
+
 	/*
 	 * METHODS FOR ADDING AND REMOVING APPOINTMENTS
 	 */
@@ -83,9 +88,10 @@ public class Patient  extends Individual implements Serializable {
 	public Long getId() {
 		return id;
 	}
-	public boolean isHasInsurance() {
+	public boolean getHasInsurance() {
 		return hasInsurance;
 	}
+
 
 	public void setHasInsurance(boolean hasInsurance) {
 		this.hasInsurance = hasInsurance;
