@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="health_workers")
 public class HealthWorker extends Individual implements Serializable {
@@ -55,11 +57,13 @@ public class HealthWorker extends Individual implements Serializable {
 	private List<HealthSpecialty> healthSpecialties  = new ArrayList<>();
 	
 	//bidireccional: muchos horarios diarios
+	@JsonIgnore
 	@OneToMany(mappedBy="healthWorker",cascade = CascadeType.ALL, orphanRemoval = true)
 	//@JoinColumn(name="schedules")
 	private List<Schedule> schedules = new ArrayList<>();
 	
 	//Bidirecciional:Un doctor, muchas citas
+	@JsonIgnore
 	@OneToMany(mappedBy="healthWorker",cascade = CascadeType.ALL, orphanRemoval = true)
 	//@JoinColumn(name="appointments")
 	private List<Appointment> appointments = new ArrayList<>();

@@ -14,17 +14,20 @@ public interface IPatientService {
 	Patient savePatient(Patient patient);
 	ResponseEntity<Patient> updatePatient(Long id, Patient patient);
 	void deletePatient (Long id);
-	void deletePatient (Patient patient);
 	List<Patient> getPatients();
+	Appointment getAppointment(Long id);
 	List<Appointment> getAppointmentsPatient(Long id);
 	List<Appointment> getAppointmentsDoc(Long id);
-	ResponseEntity<Appointment> saveAppointment(Appointment appointment, Patient patient, Slot slot);
+	ResponseEntity<Appointment> saveAppointment(Appointment appointment);
 	void deleteAppointment(Long id);
 	List<HealthWorker> getDocBySpecialty(String specialty);
 	List<HealthWorker> getHealthWorkerBySurname(String surname);
 	List<HealthWorker> getHealthWorkerByIdcard(String idcard);
 	Schedule getScheduleByHealthworkerAndByDate(HealthWorker healthworker, Calendar date);
 	List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay(HealthWorker healthworker, boolean IsWorkingDay);
+	ResponseEntity<Slot> updateSlot(Long id, Slot slot);
+	
+	
 	
 }
 

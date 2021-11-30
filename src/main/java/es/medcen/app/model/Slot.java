@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="slots")
 public class Slot implements Serializable{
@@ -40,10 +42,12 @@ public class Slot implements Serializable{
 	
 	
 	//lado de NO foreign key
+	@JsonIgnore
 	@OneToOne(mappedBy="slot")
 	private Appointment appointment;
 	
 	//bidirectional horario
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
     private Schedule schedule;
 

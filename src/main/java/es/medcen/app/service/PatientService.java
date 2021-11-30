@@ -95,11 +95,6 @@ public class PatientService implements IPatientService {
 		
 	}
 
-	@Override
-	public void deletePatient(Patient patient) {
-		patientRepo.delete(patient);
-		
-	}
 	
 	@Override
 	public ResponseEntity<Patient> updatePatient(Long id, Patient patient) {
@@ -119,7 +114,7 @@ public class PatientService implements IPatientService {
 			patientUpdated.setInsuranceCompany(patient.getInsuranceCompany());
 			
 			
-			return new ResponseEntity<>(patientRepo.save(patientUpdated),HttpStatus.OK);
+			return new ResponseEntity<>(patientRepo.save(patientUpdated),HttpStatus.CREATED);
 		}else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -128,22 +123,29 @@ public class PatientService implements IPatientService {
 /*
  * APPOINTMENTS------------------------------------- faltaria update
  */
-	
 	@Override
-	public ResponseEntity<Appointment> saveAppointment(Appointment appointment,Patient patient, Slot slot) {
-		appointment.setPatient(patient);
-		appointment.setSlot(slot);
-		slot.setAvailable(false);
-		/* GUARDAR CAMBIOS DEL SLOT EN EL REPO--S
-		Optional<Slot> slotUpdated =slotRepo.findById(slot.getId());
-		if(slotUpdated.isPresent()) {
-			Slot slot = slotUpdated.get(); 
-		}
-		*/
-		return new ResponseEntity<>(appoRepo.save(appointment),HttpStatus.OK);
+	public ResponseEntity<Appointment> saveAppointment(Appointment appointment) {
+		
+		Appointment _appo = appoRepo.save(appointment);
+		
+		return new ResponseEntity<>(_appo,HttpStatus.CREATED);
 		
 	}
-
+	
+		
+	
+	@Override
+	public Appointment getAppointment(Long id) {
+		
+		Optional<Appointment> appoint = appoRepo.findById(id);
+		 if(appoint.isPresent()) {
+			 return appoint.get();
+		 }else {
+			 return null; 
+		 }
+		
+	}
+	
 	@Override
 	public List<Appointment> getAppointmentsPatient(Long id) {
 		List<Appointment> appolist = new ArrayList<>();
@@ -173,6 +175,9 @@ public class PatientService implements IPatientService {
 	public void deleteAppointment(Long id) {
 		appoRepo.deleteById(id);
 	}
+
+	
+	
 	
 	/*
 	 * Listar doctores por especialidad
@@ -180,7 +185,7 @@ public class PatientService implements IPatientService {
 	 * 
 	 */
 	/*
-	 * healthworkers-------------- GET no create, no delete or update
+	 * healthworkers-------------- READ no create, no delete or update
 	 */
 	@Override
 	public List<HealthWorker> getDocBySpecialty(String specialty) {
@@ -252,9 +257,23 @@ public class PatientService implements IPatientService {
 	 * Read and Update Slot no create ni delete
 	 */
 
+	//UPDATE SLOT
+		@Override 
+		public ResponseEntity<Slot> updateSlot(Long id, Slot slot){
+			Optional<Slot> slotR = slotRepo.findById(id);
+			if(slotR.isPresent()) {
+				Slot _slot = slotR.get();
+				_slot.setAppointment(slot.getAppointment());
+				_slot.setAvailable(slot.isAvailable());
+				_slot.setAppointmentTime(slot.getAppointmentTime());
+				_slot.setSchedule(slot.getSchedule());
+				
+				return new ResponseEntity<>(slotRepo.save(_slot),HttpStatus.CREATED);
+			}else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
 	
-	
-	
+		}
 	
 
 	

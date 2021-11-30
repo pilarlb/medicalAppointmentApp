@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum AppointmentTime {
-	/**
-	 * 
-	 */
+	
+	
+	//9:00,9:15,9:30,9:45;
+	
 	
 	A9a("9:00"), A9b("9:15"),A9c("9:30"),A9d("9:45")
 	,A10a("10:00"), A10b("10:15"),A10c("10:30"),A10d("10:45")
@@ -19,8 +20,7 @@ public enum AppointmentTime {
 	,B17a("17:00"), B17b("17:15"),B17c("17:30"),B17d("17:45")
 	,B18a("18:00"), B18b("18:15"),B18c("18:30"),B18d("18:45")
 	,B19a("19:00"), B19b("19:15"),B19c("19:30"),B19d("19:45")
-	,B20a("20:00"), B20b("20:15"),B20c("20:30"),B20d("20:45")
-	;
+	,B20a("20:00"), B20b("20:15"),B20c("20:30"),B20d("20:45");
 	
 	public final String hour;
 
@@ -45,4 +45,5 @@ public enum AppointmentTime {
     	}
         
     }
+    
 }

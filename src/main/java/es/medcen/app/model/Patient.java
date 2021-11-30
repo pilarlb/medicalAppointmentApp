@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="patients")
 public class Patient  extends Individual implements Serializable {
@@ -40,8 +42,8 @@ public class Patient  extends Individual implements Serializable {
 	private String insuranceCompany;
 	
 	//relacion unidireccional REVISAR orphanRemoval
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	//@JoinColumn(name="appointments")
+	@JsonIgnore
+	@OneToMany(mappedBy="patient",cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Appointment> appointments = new ArrayList<>();
 
 	

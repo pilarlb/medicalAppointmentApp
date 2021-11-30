@@ -2,17 +2,21 @@ package es.medcen.app.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.medcen.app.model.Appointment;
 import es.medcen.app.model.Patient;
+import es.medcen.app.model.Slot;
 import es.medcen.app.service.PatientService;
 @RestController
 @RequestMapping("/medcen")
@@ -58,56 +62,85 @@ public class PatientController {
 	      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	  }
-	
 	//UPDATE PATIENT
-	/*
-	@PutMapping("/tutorials/{id}")
-	  public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") long id, @RequestBody Tutorial tutorial) {
-	    Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
-
-	    if (tutorialData.isPresent()) {
-	      Tutorial _tutorial = tutorialData.get();
-	      _tutorial.setTitle(tutorial.getTitle());
-	      _tutorial.setDescription(tutorial.getDescription());
-	      _tutorial.setPublished(tutorial.isPublished());
-	      return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
-	    } else {
-	      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	    }
-	  }
-	*/
-	/*
-	@RequestMapping(value = "usuarios/actualizar/{id}/", method = RequestMethod.PUT)
-	public ResponseEntity<UsuarioResponse> updateUser(@PathVariable("id") int userId,@RequestBody UsuarioSimple simple, @RequestHeader Map<String,String> headers) {
-		logger.info("Update user");
-		String userEmail = headers.getOrDefault(PARAM_USER_EMAIL,null);
-		String userPwd = headers.getOrDefault(PARAM_USER_PWD,null);
-		String newUserPwd = headers.getOrDefault(PARAM_USER_NEW_PWD,null);
+	@RequestMapping(value = "/patients/{id}", method = RequestMethod.PUT)
+	public ResponseEntity<Patient> updatePatient(@PathVariable("id") Long id, @RequestBody Patient patient) {
 		
-		if (userEmail != null && userPwd != null && newUserPwd!=null) {
-			// If userEmail and password are in the request
-			if(validateUser(userEmail, userPwd)) {
-				// Email and pwd are valid, check if user id is the same as Path variable
-				Usuario usuario = repository.findUsuarioByCorreo(userEmail);
-				if (usuario.getId() == userId) {
-					UserLogin userLogin = userLoginUpdated(usuario.getId());
-					if (userLogin.getUsuario().equals(usuario)) {
-						// Update user info
-						logger.info("Actualizando Datos");
-						usuario.setBirthDate(simple.getBirthDate());
-						usuario.setEmail(simple.getEmail());
-						usuario.setName(simple.getName());
-						usuario.setPhoneNumber(simple.getPhoneNumber());
-						utilUsuarioLogin.updateCredentials(userId, newUserPwd);
-						repository.save(usuario);
-						UsuarioResponse response = UsuarioResponse.convert(usuario);
-						return new ResponseEntity(response, HttpStatus.OK);
-					}
-				}
-			}
-		}
-		return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+		ResponseEntity<Patient> _patient = patientSer.updatePatient(id, patient);
+		
+		return _patient;
+		
 	}
 	
-	*/
+	//DELETE PATIENT
+	@RequestMapping(value = "/patients/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<HttpStatus> deletePatient(@PathVariable("id") Long id) {
+		
+		try {
+		      patientSer.deletePatient(id);
+		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		    } catch (Exception e) {
+		      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		    }
+		
+	}
+	
+	/*
+	 * APPOINTMENTS
+	 */
+	//READ
+	@RequestMapping(value = "/appointments", method = RequestMethod.GET)
+	public ResponseEntity<List<Appointment>> getAppointment(@RequestParam(required = false) Long id,
+			@RequestParam(required = false) Long idPatient, @RequestParam(required = false) Long idDoctor ){
+			
+		List<Appointment> appoList = new ArrayList<>();
+		
+		if(idPatient == null && idDoctor == null) {
+			Appointment _appoint = patientSer.getAppointment(id);
+			appoList.add(_appoint);
+			
+		}else if (id==null && idDoctor == null){
+			appoList = patientSer.getAppointmentsPatient(idPatient);
+		}else {
+			appoList = patientSer.getAppointmentsDoc(idDoctor);
+		}
+		
+		if(appoList.size() != 0) {
+			return new ResponseEntity<>(appoList, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		
+	}
+	//CREATE
+	@RequestMapping(value = "/appointments", method = RequestMethod.POST)
+	public ResponseEntity<Appointment> saveAppointment(@RequestBody Appointment appointment){
+		
+		ResponseEntity<Appointment> response = patientSer.saveAppointment(appointment);
+		/* para cambiar el estado Available del slot
+		Slot slot = appointment.getSlot();
+		slot.setAvailable(false);
+		Long id = slot.getId();
+		patientSer.updateSlot(id, slot);
+		*/
+		return response;
+		
+	}
+	
+	
+	//DELETE
+	@RequestMapping(value = "/appointments/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<HttpStatus> deleteAppointment(@PathVariable("id") Long id) {
+		
+		try {
+		      patientSer.deleteAppointment(id);
+		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		    } catch (Exception e) {
+		      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		    }
+		
+	}
+		
+	
+	
 }

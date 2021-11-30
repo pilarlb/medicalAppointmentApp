@@ -15,6 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="appointments")
 public class Appointment implements Serializable{
@@ -50,7 +52,8 @@ public class Appointment implements Serializable{
 	
 
 	//Relacion uno a uno: una cita, un slot
-	@OneToOne(cascade = CascadeType.ALL)
+	
+	@OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "slot")
 	private Slot slot;
 	
