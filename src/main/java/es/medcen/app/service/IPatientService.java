@@ -12,7 +12,7 @@ public interface IPatientService {
 	Patient getPatientsByIdcard(String idcard);
 	Patient getPatientById(Long id);
 	Patient savePatient(Patient patient);
-	ResponseEntity<Patient> updatePatient(Long id, Patient patient);
+	Patient updatePatient(Long id, Patient patient);
 	void deletePatient (Long id);
 	List<Patient> getPatients();
 	Appointment getAppointment(Long id);
@@ -25,7 +25,11 @@ public interface IPatientService {
 	List<HealthWorker> getHealthWorkerByIdcard(String idcard);
 	Schedule getScheduleByHealthworkerAndByDate(HealthWorker healthworker, Calendar date);
 	List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay(HealthWorker healthworker, boolean IsWorkingDay);
-	ResponseEntity<Slot> updateSlot(Long id, Slot slot);
+	Slot updateSlot(Long id, Slot slot);
+	HealthWorker getHealthWorker(Long id);
+	List<Slot> getSlotsBySchedule(Schedule schedule);
+	List<Slot> getSlotsByScheduleAndAvailable(Schedule schedule, boolean available);
+	Slot getSlot(Long id);
 	
 	
 	

@@ -90,8 +90,9 @@ public class Patient  extends Individual implements Serializable {
 	public Long getId() {
 		return id;
 	}
-	public boolean getHasInsurance() {
-		return hasInsurance;
+	public Boolean getHasInsurance() {
+		return Boolean.parseBoolean(String.valueOf(hasInsurance));
+		
 	}
 
 

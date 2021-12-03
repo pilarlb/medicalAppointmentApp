@@ -38,7 +38,11 @@ public class PatientService implements IPatientService {
 	private ScheduleRepository scheduleRepo;
 	@Autowired
 	private SlotRepository slotRepo;
+	//health SPECIALTY
 	
+	
+	
+	//PATIENT
 	@Override
 	public Patient getPatientsByIdcard(String idcard) { //idcard
 		Patient patient = patientRepo.findByIdCardContaining(idcard);
@@ -74,7 +78,9 @@ public class PatientService implements IPatientService {
 
 	@Override
 	public Patient savePatient(Patient patient) {
-		
+		if(patient.getHasInsurance() == false) {
+			patient.setInsuranceCompany(null);
+		}
 		Patient pat = patientRepo.save(patient);
 		return pat;
 		
@@ -97,27 +103,49 @@ public class PatientService implements IPatientService {
 
 	
 	@Override
-	public ResponseEntity<Patient> updatePatient(Long id, Patient patient) {
+	public Patient updatePatient(Long id, Patient patient) {
 		
 		Optional<Patient> patientUp =patientRepo.findById(id);
-		if(patientUp.isPresent()) {
-			Patient patientUpdated = patientUp.get();
-			patientUpdated.setIdCard(patient.getIdCard());
-			patientUpdated.setAddress(patient.getAddress());
-			patientUpdated.setBirthDate(patient.getBirthDate());
-			patientUpdated.setEmail(patient.getEmail());
-			patientUpdated.setName(patient.getName());
-			patientUpdated.setPhoneNumber(patient.getPhoneNumber());
-			patientUpdated.setPostalCode(patient.getPostalCode());
-			patientUpdated.setSurname(patient.getSurname());
-			patientUpdated.setHasInsurance(patient.getHasInsurance());
-			patientUpdated.setInsuranceCompany(patient.getInsuranceCompany());
-			
-			
-			return new ResponseEntity<>(patientRepo.save(patientUpdated),HttpStatus.CREATED);
-		}else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+			if(patientUp.isPresent()) {
+				Patient patientUpdated = patientUp.get();
+				if(patient.getIdCard() != null) {
+					patientUpdated.setIdCard(patient.getIdCard());
+				}
+				if(patient.getAddress() != null) {
+					patientUpdated.setAddress(patient.getAddress());
+				}
+				if(patient.getBirthDate() != null) {
+					patientUpdated.setBirthDate(patient.getBirthDate());
+				}
+				if(patient.getEmail() != null) {
+					patientUpdated.setEmail(patient.getEmail());
+				}
+				if(patient.getName() != null) {
+					patientUpdated.setName(patient.getName());
+				}
+				if(patient.getSurname() != null) {
+					patientUpdated.setSurname(patient.getSurname());
+				}
+				if(patient.getPhoneNumber() != null) {
+					patientUpdated.setPhoneNumber(patient.getPhoneNumber());
+				}
+				if(patient.getPostalCode() != null) {
+					patientUpdated.setPostalCode(patient.getPostalCode());
+				}
+				if(patient.getHasInsurance() != null) {
+					patientUpdated.setHasInsurance(patient.getHasInsurance());
+				}
+				
+				if(patient.getInsuranceCompany() != null) {
+					patientUpdated.setInsuranceCompany(patient.getInsuranceCompany());
+				}
+				
+
+				
+				return patientRepo.save(patientUpdated);
+			}else {
+				return null;
+			}
 		}
 		
 /*
@@ -228,6 +256,19 @@ public class PatientService implements IPatientService {
 			return null;
 		}
 	}
+	
+	@Override
+	public HealthWorker getHealthWorker(Long id) {
+		Optional<HealthWorker> healthworker = healthWRepo.findById(id);
+		 if(healthworker.isPresent()) {
+			 return healthworker.get();
+		 }else {
+			 return null; 
+		 }
+		
+	}
+	
+	
 	/*
 	 * schedule: READ no create, delete or update
 	 * 
@@ -256,21 +297,58 @@ public class PatientService implements IPatientService {
 	 * SLOTS DE UN SCHEDULE con workingday
 	 * Read and Update Slot no create ni delete
 	 */
-
+		//READ SLOT
+		@Override
+		public List<Slot> getSlotsBySchedule(Schedule schedule){
+			List<Slot> slotList = slotRepo.findBySchedule(schedule);
+			if(slotList.size() != 0) {
+				return slotList;
+			}else {
+				return null;
+			}
+			
+		}
+		@Override
+		public List<Slot> getSlotsByScheduleAndAvailable(Schedule schedule,boolean available){
+			List<Slot> slotList = slotRepo.findByScheduleAndAvailable(schedule, available);
+			if(slotList.size() != 0) {
+				return slotList;
+			}else {
+				return null;
+			}
+		}
+		
+		@Override
+		public Slot getSlot(Long id) {
+			Optional<Slot> slot = slotRepo.findById(id);
+			if(slot.isPresent()) {
+				return slot.get();
+			}else {
+				return null;
+			}
+		}
 	//UPDATE SLOT
 		@Override 
-		public ResponseEntity<Slot> updateSlot(Long id, Slot slot){
+		public Slot updateSlot(Long id, Slot slot){
 			Optional<Slot> slotR = slotRepo.findById(id);
 			if(slotR.isPresent()) {
 				Slot _slot = slotR.get();
-				_slot.setAppointment(slot.getAppointment());
-				_slot.setAvailable(slot.isAvailable());
-				_slot.setAppointmentTime(slot.getAppointmentTime());
-				_slot.setSchedule(slot.getSchedule());
+				if(slot.getAppointment() != null) {
+					_slot.setAppointment(slot.getAppointment());
+				}
+				if(slot.getAppointmentTime() != null) {
+					_slot.setAppointmentTime(slot.getAppointmentTime());
+				}
+				if(slot.getSchedule() != null) {
+					_slot.setSchedule(slot.getSchedule());
+				}
+				if(slot.isAvailable() != null) {
+					_slot.setAvailable(slot.isAvailable());
+				}
 				
-				return new ResponseEntity<>(slotRepo.save(_slot),HttpStatus.CREATED);
+				return slotRepo.save(_slot);
 			}else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return null;
 			}
 	
 		}

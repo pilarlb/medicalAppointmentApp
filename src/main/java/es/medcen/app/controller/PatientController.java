@@ -1,6 +1,11 @@
 package es.medcen.app.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.medcen.app.model.Appointment;
+import es.medcen.app.model.HealthWorker;
 import es.medcen.app.model.Patient;
+import es.medcen.app.model.Schedule;
 import es.medcen.app.model.Slot;
+import es.medcen.app.repositories.SlotRepository;
 import es.medcen.app.service.PatientService;
 @RestController
 @RequestMapping("/medcen")
@@ -28,7 +36,17 @@ public class PatientController {
 	/*
 	 * Patients
 	 */
-	
+	public static boolean isNumeric(String strNum) {
+	    if (strNum == null) {
+	        return false;
+	    }
+	    try {
+	       int number = Integer.parseInt(strNum);
+	    } catch (NumberFormatException nfe) {
+	        return false;
+	    }
+	    return true;
+	}
 	@RequestMapping(value = "/patients", method = RequestMethod.GET)
 	public ResponseEntity<List<Patient>> getPatients(@RequestParam(required = false) String surname,
 			@RequestParam(required = false) Long id){
@@ -66,9 +84,13 @@ public class PatientController {
 	@RequestMapping(value = "/patients/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<Patient> updatePatient(@PathVariable("id") Long id, @RequestBody Patient patient) {
 		
-		ResponseEntity<Patient> _patient = patientSer.updatePatient(id, patient);
+		Patient _patient = patientSer.updatePatient(id, patient);
 		
-		return _patient;
+		if(_patient != null) {
+			 return new ResponseEntity<>(_patient, HttpStatus.CREATED);
+		}else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 	}
 	
@@ -116,14 +138,30 @@ public class PatientController {
 	@RequestMapping(value = "/appointments", method = RequestMethod.POST)
 	public ResponseEntity<Appointment> saveAppointment(@RequestBody Appointment appointment){
 		
-		ResponseEntity<Appointment> response = patientSer.saveAppointment(appointment);
-		/* para cambiar el estado Available del slot
-		Slot slot = appointment.getSlot();
-		slot.setAvailable(false);
-		Long id = slot.getId();
-		patientSer.updateSlot(id, slot);
-		*/
-		return response;
+		if(appointment.getPatient() == null) {
+
+			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+		}else {
+			
+			Slot slot = appointment.getSlot();
+			if(appointment.getHealthWorker()  == null) {
+				HealthWorker healthworker = slot.getSchedule().getHealthWorker();
+				appointment.setHealthWorker(healthworker);
+			}
+			
+			ResponseEntity<Appointment> response = patientSer.saveAppointment(appointment);
+			
+			// para cambiar el estado Available del slot
+			
+			Long id = slot.getId();
+			Slot _slot = new Slot();
+			_slot.setAvailable(false);
+			patientSer.updateSlot(id, _slot);
+			
+			return response;
+		}
+		
 		
 	}
 	
@@ -139,6 +177,123 @@ public class PatientController {
 		      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		    }
 		
+	}
+		
+	
+	//DOCTOR 
+	//READ
+	@RequestMapping(value = "/healthworkers", method = RequestMethod.GET)
+	public ResponseEntity<List<HealthWorker>> getHealthworker(@RequestParam(required = false) Long id,
+			@RequestParam(required = false) String specialty, @RequestParam(required = false) String surname ){
+				
+		 List<HealthWorker> healthworkerList= new ArrayList<>();
+		 
+		 if(id != null) {
+			 HealthWorker _healthworker = patientSer.getHealthWorker(id);
+			 healthworkerList.add(_healthworker);
+			 
+		 }else if (specialty != null) {
+			 healthworkerList = patientSer.getDocBySpecialty(specialty); // containing
+			 
+		 }else if (surname != null) {
+			 healthworkerList = patientSer.getHealthWorkerBySurname(surname);
+			 
+		 }else {
+			 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		 }
+		
+		 return new ResponseEntity<>(healthworkerList, HttpStatus.OK);
+		
+	}
+	
+	//SCHEDULE
+	//read
+	@RequestMapping(value = "/schedules", method = RequestMethod.GET)
+	public ResponseEntity<List<Schedule>> getSchedule(@RequestBody HealthWorker healthworker,
+			@RequestParam(required = false) boolean IsWorkingDay, @RequestParam(required = false) String date){
+		
+		List<Schedule> scheList = new ArrayList<>();
+		if(date != null) { //date format dd-mm-yyyy
+			
+			SimpleDateFormat formatdate = new SimpleDateFormat("yyyy-MM-dd");
+				
+				String[] parts = date.split("-");
+				if(parts.length == 3) {
+					String day = parts[0];
+					String month= parts[1];
+					String year = parts[2];
+					
+					if(isNumeric(day) && isNumeric(month) && isNumeric(year) &&
+					day.length() == 2 && month.length() == 2 && year.length()== 4) {				
+						try {
+						
+							Date calDate = formatdate.parse(year+"-"+month+"-"+day);
+							Calendar cal = new GregorianCalendar();
+							cal.setTime(calDate);
+							
+							Schedule schedule = patientSer.getScheduleByHealthworkerAndByDate(healthworker, cal);
+							scheList.add(schedule);
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}else {
+						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+					}
+				}else {
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				}
+				
+		}else  {
+			scheList = patientSer.getSchedulesByHealthWorkerAndByIsWorkingDay(healthworker, IsWorkingDay);
+		}
+		
+		if(scheList.size() != 0) {
+			return new ResponseEntity<>(scheList, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		
+	}
+	
+	//SLOT
+	//read
+	@RequestMapping(value = "/slots", method = RequestMethod.GET)
+	public ResponseEntity<List<Slot>> getSlots(@RequestBody Schedule schedule,
+			@RequestParam(required = false) Boolean available){
+		List<Slot> slotList =  new ArrayList<>();
+		if(available != null) {
+			slotList = patientSer.getSlotsByScheduleAndAvailable(schedule, available);
+		}else {
+			slotList = patientSer.getSlotsBySchedule(schedule);
+		}
+		return new ResponseEntity<>(slotList, HttpStatus.OK);
+		
+		
+	}
+	@RequestMapping(value = "/slots/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Slot> getSlot(@PathVariable("id") Long id){
+				
+		Slot slot = patientSer.getSlot(id);
+		if(slot != null) {
+			return new ResponseEntity<>(slot, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		
+	}
+	//Update
+	@RequestMapping(value = "/slots", method = RequestMethod.PUT)
+	public ResponseEntity<Slot> updateSlot(@RequestParam(required = true) Long id, @RequestBody Slot slot) {
+		
+		Slot _slot= patientSer.updateSlot(id, slot);
+		
+		if(_slot != null) {
+			
+				 return new ResponseEntity<>(_slot, HttpStatus.CREATED);
+			}else {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
 	}
 		
 	

@@ -96,8 +96,8 @@ public class Slot implements Serializable{
 		this.appointmentTime = appointmentTime;
 	}
 	
-	public boolean isAvailable() {
-		return available;
+	public Boolean isAvailable() {
+		return Boolean.parseBoolean(String.valueOf(available));
 	}
 
 	public void setAvailable(boolean available) {
