@@ -17,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="schedules")
 public class Schedule implements Serializable{
@@ -38,10 +40,14 @@ public class Schedule implements Serializable{
 	@Column(nullable = false)
 	private Calendar date;
 	
+	@Column(name="formatted_date")
+	private String formattedDate;
+	
 	@Column(name = "is_working_day")
 	private boolean isWorkingDay;
 	
 	//bidirectional varios horarios a un doctor
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
     private HealthWorker healthWorker;
 	
@@ -51,6 +57,7 @@ public class Schedule implements Serializable{
 	 * - en el hijo (many) equals y hashCode
 	 */
 	//bidireccional REVISAR orphanRemoval
+	@JsonIgnore
 	@OneToMany(mappedBy="schedule",cascade = CascadeType.ALL, orphanRemoval = true)
 	//@JoinColumn(name="slots")
 	private List<Slot> slots= new ArrayList<>();
@@ -111,9 +118,21 @@ public class Schedule implements Serializable{
 
 
 	//GETTERS AND SETTERS
+	
+	public String getFormattedDate() {
+		return formattedDate;
+	}
+
+
+	public void setFormattedDate(String formattedDate) {
+		this.formattedDate = formattedDate;
+	}
+
 	public Calendar getDate() {
 		return date;
 	}
+
+
 
 	public void setDate(Calendar date) {
 		this.date = date;

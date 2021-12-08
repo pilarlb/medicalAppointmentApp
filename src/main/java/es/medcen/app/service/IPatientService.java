@@ -18,18 +18,18 @@ public interface IPatientService {
 	Appointment getAppointment(Long id);
 	List<Appointment> getAppointmentsPatient(Long id);
 	List<Appointment> getAppointmentsDoc(Long id);
-	ResponseEntity<Appointment> saveAppointment(Appointment appointment);
+	Appointment saveAppointment(Appointment appointment);
 	void deleteAppointment(Long id);
 	List<HealthWorker> getDocBySpecialty(String specialty);
 	List<HealthWorker> getHealthWorkerBySurname(String surname);
 	List<HealthWorker> getHealthWorkerByIdcard(String idcard);
-	Schedule getScheduleByHealthworkerAndByDate(HealthWorker healthworker, Calendar date);
-	List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay(HealthWorker healthworker, boolean IsWorkingDay);
 	Slot updateSlot(Long id, Slot slot);
 	HealthWorker getHealthWorker(Long id);
-	List<Slot> getSlotsBySchedule(Schedule schedule);
-	List<Slot> getSlotsByScheduleAndAvailable(Schedule schedule, boolean available);
 	Slot getSlot(Long id);
+	List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay(Long idHealthworker, boolean IsWorkingDay);
+	Schedule getScheduleByHealthworkerAndByDate(Long idHealthworker, Calendar date);
+	List<Slot> getSlotsBySchedule(Long iDschedule);
+	List<Slot> getSlotsByScheduleAndAvailable(Long iDschedule, boolean available, String hourTime);
 	
 	
 	

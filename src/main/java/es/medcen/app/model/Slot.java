@@ -35,9 +35,11 @@ public class Slot implements Serializable{
 	
 	
 	@Column(name = "appointment_time",nullable = false)
+	private String appointmentTime;
+	/*
 	@Enumerated(EnumType.STRING)
 	private AppointmentTime appointmentTime;
-	
+	*/
 	private boolean available;
 	
 	
@@ -57,7 +59,7 @@ public class Slot implements Serializable{
 	public Slot() {
 		super();
 	}
-	public Slot(AppointmentTime appointmentTime, boolean available, Appointment appointment, Schedule schedule) {
+	public Slot(String appointmentTime, boolean available, Appointment appointment, Schedule schedule) {
 		super();
 		this.appointmentTime = appointmentTime;
 		this.available = available;
@@ -88,14 +90,13 @@ public class Slot implements Serializable{
 		return id;
 	}
 	
-
-	public AppointmentTime getAppointmentTime() {
+	
+	public String getAppointmentTime() {
 		return appointmentTime;
 	}
-	public void setAppointmentTime(AppointmentTime appointmentTime) {
+	public void setAppointmentTime(String appointmentTime) {
 		this.appointmentTime = appointmentTime;
 	}
-	
 	public Boolean isAvailable() {
 		return Boolean.parseBoolean(String.valueOf(available));
 	}

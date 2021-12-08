@@ -152,11 +152,11 @@ public class PatientService implements IPatientService {
  * APPOINTMENTS------------------------------------- faltaria update
  */
 	@Override
-	public ResponseEntity<Appointment> saveAppointment(Appointment appointment) {
+	public Appointment saveAppointment(Appointment appointment) {
 		
 		Appointment _appo = appoRepo.save(appointment);
 		
-		return new ResponseEntity<>(_appo,HttpStatus.CREATED);
+		return _appo;
 		
 	}
 	
@@ -275,16 +275,28 @@ public class PatientService implements IPatientService {
 	 */
 	
 	@Override
-	public Schedule getScheduleByHealthworkerAndByDate(HealthWorker healthworker, Calendar date) {
+	public Schedule getScheduleByHealthworkerAndByDate(Long idHealthworker, Calendar date) {
 		//yyyy-mm-dd
-		Schedule schedule = scheduleRepo.findByHealthWorkerAndDate(healthworker, date);
-		return schedule;
+		Optional<HealthWorker> _healthworker = healthWRepo.findById(idHealthworker);
+		if(_healthworker.isPresent()) {
+			HealthWorker healthworker = _healthworker.get();
+			Schedule schedule = scheduleRepo.findByHealthWorkerAndDate(healthworker, date);
+			return schedule;
+		}else {
+			return null;
+		}
+		
 	}
 	
 	@Override
-	public List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay (HealthWorker healthworker, boolean IsWorkingDay){
+	public List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay (Long idHealthworker, boolean IsWorkingDay){
 		List<Schedule>  scheduleList = new ArrayList<>();
-		scheduleList = scheduleRepo.findByHealthWorkerAndIsWorkingDay(healthworker, IsWorkingDay);
+		Optional<HealthWorker> _healthworker = healthWRepo.findById(idHealthworker);
+		if(_healthworker.isPresent()) {
+			HealthWorker healthworker = _healthworker.get();
+			scheduleList = scheduleRepo.findByHealthWorkerAndIsWorkingDay(healthworker, IsWorkingDay);
+		}
+		
 		if(scheduleList.size() != 0) {
 			return scheduleList;
 		}else {
@@ -299,8 +311,13 @@ public class PatientService implements IPatientService {
 	 */
 		//READ SLOT
 		@Override
-		public List<Slot> getSlotsBySchedule(Schedule schedule){
-			List<Slot> slotList = slotRepo.findBySchedule(schedule);
+		public List<Slot> getSlotsBySchedule(Long iDschedule){
+			List<Slot> slotList = new ArrayList<Slot>();
+			Optional<Schedule> _schedule = scheduleRepo.findById(iDschedule);
+			if(_schedule.isPresent()) {
+				Schedule schedule = _schedule.get();
+				 slotList = slotRepo.findBySchedule(schedule);
+			}
 			if(slotList.size() != 0) {
 				return slotList;
 			}else {
@@ -309,10 +326,33 @@ public class PatientService implements IPatientService {
 			
 		}
 		@Override
-		public List<Slot> getSlotsByScheduleAndAvailable(Schedule schedule,boolean available){
-			List<Slot> slotList = slotRepo.findByScheduleAndAvailable(schedule, available);
+		public List<Slot> getSlotsByScheduleAndAvailable(Long iDschedule,boolean available, String hourTime){
+			List<Slot> slotList  = new ArrayList<Slot>();
+			List<Slot> slotHourList  = new ArrayList<Slot>();
+			
+		
+			
+			Optional<Schedule> _schedule = scheduleRepo.findById(iDschedule);
+			if(_schedule.isPresent()) {
+				Schedule schedule = _schedule.get();
+				 slotList = slotRepo.findByScheduleAndAvailable(schedule, available);
+			}
 			if(slotList.size() != 0) {
-				return slotList;
+				
+				for (Slot slot: slotList){
+					
+					if(slot.getAppointmentTime().startsWith(hourTime)) {
+						slotHourList.add(slot); 
+					}
+				}
+				
+				if(slotHourList.size() != 0) {
+					return slotHourList;
+				}else {
+					return slotList;
+				}
+				
+				
 			}else {
 				return null;
 			}

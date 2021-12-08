@@ -136,11 +136,12 @@ public class PatientController {
 	}
 	//CREATE
 	@RequestMapping(value = "/appointments", method = RequestMethod.POST)
-	public ResponseEntity<Appointment> saveAppointment(@RequestBody Appointment appointment){
+	public Appointment saveAppointment(@RequestBody Appointment appointment){
 		
 		if(appointment.getPatient() == null) {
-
-			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+			return null;
+			//return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			
 		}else {
 			
@@ -150,7 +151,7 @@ public class PatientController {
 				appointment.setHealthWorker(healthworker);
 			}
 			
-			ResponseEntity<Appointment> response = patientSer.saveAppointment(appointment);
+			Appointment appo = patientSer.saveAppointment(appointment);
 			
 			// para cambiar el estado Available del slot
 			
@@ -159,7 +160,8 @@ public class PatientController {
 			_slot.setAvailable(false);
 			patientSer.updateSlot(id, _slot);
 			
-			return response;
+			return appo;
+			//return new ResponseEntity<>(appo,HttpStatus.CREATED);
 		}
 		
 		
@@ -205,47 +207,79 @@ public class PatientController {
 		 return new ResponseEntity<>(healthworkerList, HttpStatus.OK);
 		
 	}
-	
+	public Calendar dateToCalendar(String date) {
+		SimpleDateFormat formatdate = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cal = new GregorianCalendar();
+		String[] parts = date.split("-");
+		if(parts.length == 3) {
+			String day = parts[0];
+			String month= parts[1];
+			String year = parts[2];
+			
+			if(isNumeric(day) && isNumeric(month) && isNumeric(year) &&
+			day.length() == 2 && month.length() == 2 && year.length()== 4) {				
+				
+				
+					Date calDate = null;
+					try {
+						calDate = formatdate.parse(year+"-"+month+"-"+day);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					cal.setTime(calDate);
+					
+			}
+			}
+		return cal;
+	}
 	//SCHEDULE
 	//read
 	@RequestMapping(value = "/schedules", method = RequestMethod.GET)
-	public ResponseEntity<List<Schedule>> getSchedule(@RequestBody HealthWorker healthworker,
+	public ResponseEntity<List<Schedule>> getSchedule(@RequestParam Long iDhealthworker,
 			@RequestParam(required = false) boolean IsWorkingDay, @RequestParam(required = false) String date){
 		
 		List<Schedule> scheList = new ArrayList<>();
 		if(date != null) { //date format dd-mm-yyyy
+			Calendar cal = dateToCalendar(date);
+			Schedule schedule = patientSer.getScheduleByHealthworkerAndByDate(iDhealthworker, cal);
+			scheList.add(schedule);
 			
-			SimpleDateFormat formatdate = new SimpleDateFormat("yyyy-MM-dd");
-				
-				String[] parts = date.split("-");
-				if(parts.length == 3) {
-					String day = parts[0];
-					String month= parts[1];
-					String year = parts[2];
 					
-					if(isNumeric(day) && isNumeric(month) && isNumeric(year) &&
-					day.length() == 2 && month.length() == 2 && year.length()== 4) {				
-						try {
-						
-							Date calDate = formatdate.parse(year+"-"+month+"-"+day);
-							Calendar cal = new GregorianCalendar();
-							cal.setTime(calDate);
-							
-							Schedule schedule = patientSer.getScheduleByHealthworkerAndByDate(healthworker, cal);
-							scheList.add(schedule);
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}else {
-						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-					}
-				}else {
-					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-				}
+					//return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				
 				
 		}else  {
-			scheList = patientSer.getSchedulesByHealthWorkerAndByIsWorkingDay(healthworker, IsWorkingDay);
+			scheList = patientSer.getSchedulesByHealthWorkerAndByIsWorkingDay(iDhealthworker, IsWorkingDay);
+			
+			for (Schedule schedule: scheList) {
+				if(schedule.getFormattedDate() == null) {
+					Calendar _dat = schedule.getDate();
+					int day= _dat.get(Calendar.DATE);
+					int month = _dat.get(Calendar.MONTH);
+					int year =_dat.get(Calendar.YEAR);
+					String _day;
+					String _month;
+					if(day <10) {
+						_day = "0"+String.valueOf(day);
+					
+					}else {
+						_day=String.valueOf(day);
+					}
+					if(month<10) {
+						_month= "0"+String.valueOf(month);
+					}else {
+						_month=String.valueOf(month);
+					}
+					String _year = String.valueOf(year);
+					
+					schedule.setFormattedDate(_day+"-"+_month+"-"+_year);
+					
+				}
+				
+			}
+			
 		}
 		
 		if(scheList.size() != 0) {
@@ -259,13 +293,15 @@ public class PatientController {
 	//SLOT
 	//read
 	@RequestMapping(value = "/slots", method = RequestMethod.GET)
-	public ResponseEntity<List<Slot>> getSlots(@RequestBody Schedule schedule,
-			@RequestParam(required = false) Boolean available){
+	public ResponseEntity<List<Slot>> getSlots(@RequestParam Long iDschedule,
+			@RequestParam Boolean available,
+			@RequestParam String hourTime){
 		List<Slot> slotList =  new ArrayList<>();
+		//Schedule schedule = patientSer
 		if(available != null) {
-			slotList = patientSer.getSlotsByScheduleAndAvailable(schedule, available);
+			slotList = patientSer.getSlotsByScheduleAndAvailable(iDschedule, available, hourTime);
 		}else {
-			slotList = patientSer.getSlotsBySchedule(schedule);
+			slotList = patientSer.getSlotsBySchedule(iDschedule);
 		}
 		return new ResponseEntity<>(slotList, HttpStatus.OK);
 		
