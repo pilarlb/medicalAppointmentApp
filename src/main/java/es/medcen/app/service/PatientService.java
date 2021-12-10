@@ -38,7 +38,6 @@ public class PatientService implements IPatientService {
 	private ScheduleRepository scheduleRepo;
 	@Autowired
 	private SlotRepository slotRepo;
-	//health SPECIALTY
 	
 	
 	
@@ -101,7 +100,6 @@ public class PatientService implements IPatientService {
 		
 	}
 
-	
 	@Override
 	public Patient updatePatient(Long id, Patient patient) {
 		
@@ -159,8 +157,7 @@ public class PatientService implements IPatientService {
 		return _appo;
 		
 	}
-	
-		
+			
 	
 	@Override
 	public Appointment getAppointment(Long id) {
@@ -208,12 +205,7 @@ public class PatientService implements IPatientService {
 	
 	
 	
-	/*
-	 * Listar doctores por especialidad
-	 * cada especialidad se repite por doctor que la tieneç
-	 * 
-	 */
-	/*
+		/*
 	 * healthworkers-------------- READ no create, no delete or update
 	 */
 	@Override
@@ -271,7 +263,7 @@ public class PatientService implements IPatientService {
 	
 	
 	/*
-	 * schedule: READ no create, delete or update
+	 * schedule: READ and UPDATE no create, delete 
 	 * 
 	 */
 	
@@ -407,90 +399,90 @@ public class PatientService implements IPatientService {
 	 * SLOTS DE UN SCHEDULE con workingday
 	 * Read and Update Slot no create ni delete
 	 */
-		//READ SLOT
-		@Override
-		public List<Slot> getSlotsBySchedule(Long iDschedule){
-			List<Slot> slotList = new ArrayList<Slot>();
-			Optional<Schedule> _schedule = scheduleRepo.findById(iDschedule);
-			if(_schedule.isPresent()) {
-				Schedule schedule = _schedule.get();
-				 slotList = slotRepo.findBySchedule(schedule);
+	
+	@Override
+	public List<Slot> getSlotsBySchedule(Long iDschedule){
+		List<Slot> slotList = new ArrayList<Slot>();
+		Optional<Schedule> _schedule = scheduleRepo.findById(iDschedule);
+		if(_schedule.isPresent()) {
+			Schedule schedule = _schedule.get();
+			 slotList = slotRepo.findBySchedule(schedule);
+		}
+		if(slotList.size() != 0) {
+			return slotList;
+		}else {
+			return null;
+		}
+		
+	}
+	@Override
+	public List<Slot> getSlotsByScheduleAndAvailable(Long iDschedule,boolean available, String hourTime){
+		List<Slot> slotList  = new ArrayList<Slot>();
+		List<Slot> slotHourList  = new ArrayList<Slot>();
+		
+	
+		
+		Optional<Schedule> _schedule = scheduleRepo.findById(iDschedule);
+		if(_schedule.isPresent()) {
+			Schedule schedule = _schedule.get();
+			 slotList = slotRepo.findByScheduleAndAvailable(schedule, available);
+		}
+		if(slotList.size() != 0) {
+			
+			for (Slot slot: slotList){
+				
+				if(slot.getAppointmentTime().startsWith(hourTime)) {
+					slotHourList.add(slot); 
+				}
 			}
-			if(slotList.size() != 0) {
+			
+			if(slotHourList.size() != 0) {
+				return slotHourList;
+			}else {
 				return slotList;
-			}else {
-				return null;
 			}
 			
-		}
-		@Override
-		public List<Slot> getSlotsByScheduleAndAvailable(Long iDschedule,boolean available, String hourTime){
-			List<Slot> slotList  = new ArrayList<Slot>();
-			List<Slot> slotHourList  = new ArrayList<Slot>();
 			
-		
-			
-			Optional<Schedule> _schedule = scheduleRepo.findById(iDschedule);
-			if(_schedule.isPresent()) {
-				Schedule schedule = _schedule.get();
-				 slotList = slotRepo.findByScheduleAndAvailable(schedule, available);
-			}
-			if(slotList.size() != 0) {
-				
-				for (Slot slot: slotList){
-					
-					if(slot.getAppointmentTime().startsWith(hourTime)) {
-						slotHourList.add(slot); 
-					}
-				}
-				
-				if(slotHourList.size() != 0) {
-					return slotHourList;
-				}else {
-					return slotList;
-				}
-				
-				
-			}else {
-				return null;
-			}
+		}else {
+			return null;
 		}
-		
-		@Override
-		public Slot getSlot(Long id) {
-			Optional<Slot> slot = slotRepo.findById(id);
-			if(slot.isPresent()) {
-				return slot.get();
-			}else {
-				return null;
-			}
-		}
-	//UPDATE SLOT
-		@Override 
-		public Slot updateSlot(Long id, Slot slot){
-			Optional<Slot> slotR = slotRepo.findById(id);
-			if(slotR.isPresent()) {
-				Slot _slot = slotR.get();
-				if(slot.getAppointment() != null) {
-					_slot.setAppointment(slot.getAppointment());
-				}
-				if(slot.getAppointmentTime() != null) {
-					_slot.setAppointmentTime(slot.getAppointmentTime());
-				}
-				if(slot.getSchedule() != null) {
-					_slot.setSchedule(slot.getSchedule());
-				}
-				if(slot.isAvailable() != null) {
-					_slot.setAvailable(slot.isAvailable());
-				}
-				
-				return slotRepo.save(_slot);
-			}else {
-				return null;
-			}
+	}
 	
+	@Override
+	public Slot getSlot(Long id) {
+		Optional<Slot> slot = slotRepo.findById(id);
+		if(slot.isPresent()) {
+			return slot.get();
+		}else {
+			return null;
 		}
-	
+	}
+
+	@Override 
+	public Slot updateSlot(Long id, Slot slot){
+		Optional<Slot> slotR = slotRepo.findById(id);
+		if(slotR.isPresent()) {
+			Slot _slot = slotR.get();
+			if(slot.getAppointment() != null) {
+				_slot.setAppointment(slot.getAppointment());
+			}
+			if(slot.getAppointmentTime() != null) {
+				_slot.setAppointmentTime(slot.getAppointmentTime());
+			}
+			if(slot.getSchedule() != null) {
+				_slot.setSchedule(slot.getSchedule());
+			}
+			if(slot.isAvailable() != null) {
+				_slot.setAvailable(slot.isAvailable());
+			}
+			
+			return slotRepo.save(_slot);
+		}else {
+			return null;
+		}
+
+	}
+
 
 	
 }

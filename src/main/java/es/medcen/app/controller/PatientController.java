@@ -250,7 +250,7 @@ public class PatientController {
 		      array.add("HttpStatus.OK");
 		      return array ;
 		    } catch (Exception e) {
-		      return null;
+		      return null ;
 		    }
 		
 	}
