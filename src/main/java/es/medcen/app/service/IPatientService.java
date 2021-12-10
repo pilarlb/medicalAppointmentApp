@@ -30,6 +30,8 @@ public interface IPatientService {
 	Schedule getScheduleByHealthworkerAndByDate(Long idHealthworker, Calendar date);
 	List<Slot> getSlotsBySchedule(Long iDschedule);
 	List<Slot> getSlotsByScheduleAndAvailable(Long iDschedule, boolean available, String hourTime);
+	Schedule getScheduleByAppointment(Long idAppointment);
+	Schedule updateSchedule(Long idSchedule, Schedule sche);
 	
 	
 	

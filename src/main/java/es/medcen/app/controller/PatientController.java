@@ -34,8 +34,9 @@ public class PatientController {
 	private PatientService patientSer;
 	
 	/*
-	 * Patients
+	 * METHODS
 	 */
+	
 	public static boolean isNumeric(String strNum) {
 	    if (strNum == null) {
 	        return false;
@@ -47,6 +48,74 @@ public class PatientController {
 	    }
 	    return true;
 	}
+	//method for formatted Date
+	public List<Schedule> datetoString (List<Schedule> list){
+		for (Schedule schedule: list) {
+			if(schedule.getFormattedDate() == null) {
+				Calendar _dat = schedule.getDate();
+				int day= _dat.get(Calendar.DATE);
+				int month = _dat.get(Calendar.MONTH);
+				int year =_dat.get(Calendar.YEAR);
+				String _day;
+				String _month;
+				if(day <10) {
+					_day = "0"+String.valueOf(day);
+				
+				}else {
+					_day=String.valueOf(day);
+				}
+				if(month<10) {
+					_month= "0"+String.valueOf(month);
+				}else {
+					_month=String.valueOf(month);
+				}
+				String _year = String.valueOf(year);
+				
+				String completedDate = _day+"-"+_month+"-"+_year;
+				schedule.setFormattedDate(completedDate);
+				Schedule scheDate = new Schedule();
+				scheDate.setFormattedDate(completedDate);
+				patientSer.updateSchedule(schedule.getId(),scheDate);
+				
+			}
+			
+		}
+		return list;
+	}
+	
+	public Calendar dateToCalendar(String date) {
+		SimpleDateFormat formatdate = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cal = new GregorianCalendar();
+		String[] parts = date.split("-");
+		if(parts.length == 3) {
+			String day = parts[0];
+			String month= parts[1];
+			String year = parts[2];
+			
+			if(isNumeric(day) && isNumeric(month) && isNumeric(year) &&
+			day.length() == 2 && month.length() == 2 && year.length()== 4) {				
+				
+				
+					Date calDate = null;
+					try {
+						calDate = formatdate.parse(year+"-"+month+"-"+day);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					cal.setTime(calDate);
+					
+			}
+			}
+		return cal;
+	}
+	
+	
+	
+	/*
+	 * Patients
+	 */
 	@RequestMapping(value = "/patients", method = RequestMethod.GET)
 	public ResponseEntity<List<Patient>> getPatients(@RequestParam(required = false) String surname,
 			@RequestParam(required = false) Long id){
@@ -170,13 +239,18 @@ public class PatientController {
 	
 	//DELETE
 	@RequestMapping(value = "/appointments/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<HttpStatus> deleteAppointment(@PathVariable("id") Long id) {
+	public List<String> deleteAppointment(@PathVariable("id") Long id) {
 		
 		try {
+				Slot slot = patientSer.getAppointment(id).getSlot();
+				slot.setAvailable(true);
+				patientSer.updateSlot(slot.getId(), slot);
 		      patientSer.deleteAppointment(id);
-		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		      List<String> array = new ArrayList<String>();
+		      array.add("HttpStatus.OK");
+		      return array ;
 		    } catch (Exception e) {
-		      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		      return null;
 		    }
 		
 	}
@@ -207,79 +281,32 @@ public class PatientController {
 		 return new ResponseEntity<>(healthworkerList, HttpStatus.OK);
 		
 	}
-	public Calendar dateToCalendar(String date) {
-		SimpleDateFormat formatdate = new SimpleDateFormat("yyyy-MM-dd");
-		Calendar cal = new GregorianCalendar();
-		String[] parts = date.split("-");
-		if(parts.length == 3) {
-			String day = parts[0];
-			String month= parts[1];
-			String year = parts[2];
-			
-			if(isNumeric(day) && isNumeric(month) && isNumeric(year) &&
-			day.length() == 2 && month.length() == 2 && year.length()== 4) {				
-				
-				
-					Date calDate = null;
-					try {
-						calDate = formatdate.parse(year+"-"+month+"-"+day);
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					cal.setTime(calDate);
-					
-			}
-			}
-		return cal;
-	}
+
+	
 	//SCHEDULE
 	//read
 	@RequestMapping(value = "/schedules", method = RequestMethod.GET)
-	public ResponseEntity<List<Schedule>> getSchedule(@RequestParam Long iDhealthworker,
-			@RequestParam(required = false) boolean IsWorkingDay, @RequestParam(required = false) String date){
+	public ResponseEntity<List<Schedule>> getSchedule(@RequestParam (required = false) Long iDhealthworker,
+			@RequestParam(required = false) boolean IsWorkingDay, @RequestParam(required = false) String date,
+			@RequestParam(required = false) Long idAppointment){
 		
 		List<Schedule> scheList = new ArrayList<>();
-		if(date != null) { //date format dd-mm-yyyy
+		
+		if (idAppointment != null){
+			Schedule sche = patientSer.getScheduleByAppointment(idAppointment);
+			if(sche != null) {
+				scheList.add(sche);
+				//scheList = datetoString(scheList);
+			}
+		}else if(iDhealthworker != null && date != null ) {//date format dd-mm-yyyy
 			Calendar cal = dateToCalendar(date);
 			Schedule schedule = patientSer.getScheduleByHealthworkerAndByDate(iDhealthworker, cal);
 			scheList.add(schedule);
-			
-					
-					//return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-				
-				
-		}else  {
+			scheList = datetoString(scheList);
+		}else if(iDhealthworker != null) {
 			scheList = patientSer.getSchedulesByHealthWorkerAndByIsWorkingDay(iDhealthworker, IsWorkingDay);
 			
-			for (Schedule schedule: scheList) {
-				if(schedule.getFormattedDate() == null) {
-					Calendar _dat = schedule.getDate();
-					int day= _dat.get(Calendar.DATE);
-					int month = _dat.get(Calendar.MONTH);
-					int year =_dat.get(Calendar.YEAR);
-					String _day;
-					String _month;
-					if(day <10) {
-						_day = "0"+String.valueOf(day);
-					
-					}else {
-						_day=String.valueOf(day);
-					}
-					if(month<10) {
-						_month= "0"+String.valueOf(month);
-					}else {
-						_month=String.valueOf(month);
-					}
-					String _year = String.valueOf(year);
-					
-					schedule.setFormattedDate(_day+"-"+_month+"-"+_year);
-					
-				}
 				
-			}
-			
 		}
 		
 		if(scheList.size() != 0) {

@@ -201,6 +201,7 @@ public class PatientService implements IPatientService {
 
 	@Override
 	public void deleteAppointment(Long id) {
+			
 		appoRepo.deleteById(id);
 	}
 
@@ -289,16 +290,113 @@ public class PatientService implements IPatientService {
 	}
 	
 	@Override
+	public Schedule getScheduleByAppointment(Long idAppointment) {
+		Optional<Appointment> appo = appoRepo.findById(idAppointment);
+		Schedule sche;
+		if(appo.isPresent()) {
+			sche = appo.get().getSlot().getSchedule();
+			
+			if(sche.getFormattedDate() == null) {
+				Calendar _dat = sche.getDate();
+				int day= _dat.get(Calendar.DATE);
+				int month = _dat.get(Calendar.MONTH);
+				int year =_dat.get(Calendar.YEAR);
+				String _day;
+				String _month;
+				if(day <10) {
+					_day = "0"+String.valueOf(day);
+				
+				}else {
+					_day=String.valueOf(day);
+				}
+				if(month<10) {
+					_month= "0"+String.valueOf(month);
+				}else {
+					_month=String.valueOf(month);
+				}
+				String _year = String.valueOf(year);
+				
+				String completedDate = _day+"-"+_month+"-"+_year;
+				sche.setFormattedDate(completedDate);
+				Schedule scheDate = new Schedule();
+				scheDate.setFormattedDate(completedDate);
+				updateSchedule(sche.getId(),scheDate);
+				
+			}
+			
+			System.out.println("BUCLE - IDAPPOINTMENT -----SCHEDULE LIST");
+			return sche;
+		}
+		return null;
+	}
+	
+	@Override
 	public List<Schedule> getSchedulesByHealthWorkerAndByIsWorkingDay (Long idHealthworker, boolean IsWorkingDay){
 		List<Schedule>  scheduleList = new ArrayList<>();
 		Optional<HealthWorker> _healthworker = healthWRepo.findById(idHealthworker);
 		if(_healthworker.isPresent()) {
 			HealthWorker healthworker = _healthworker.get();
 			scheduleList = scheduleRepo.findByHealthWorkerAndIsWorkingDay(healthworker, IsWorkingDay);
-		}
-		
+			
+			for (Schedule schedule: scheduleList) {
+				if(schedule.getFormattedDate() == null) {
+					Calendar _dat = schedule.getDate();
+					int day= _dat.get(Calendar.DATE);
+					int month = _dat.get(Calendar.MONTH);
+					int year =_dat.get(Calendar.YEAR);
+					String _day;
+					String _month;
+					if(day <10) {
+						_day = "0"+String.valueOf(day);
+					
+					}else {
+						_day=String.valueOf(day);
+					}
+					if(month<10) {
+						_month= "0"+String.valueOf(month);
+					}else {
+						_month=String.valueOf(month);
+					}
+					String _year = String.valueOf(year);
+					
+					String completedDate = _day+"-"+_month+"-"+_year;
+					schedule.setFormattedDate(completedDate);
+					Schedule scheDate = new Schedule();
+					scheDate.setFormattedDate(completedDate);
+					
+					updateSchedule(schedule.getId(),scheDate);
+					
+				}
+				System.out.println("BUCLE - IDHEALTHWORKER AND BOOLEAN DAY -----SCHEDULE LIST");
+			}
+			
+		}//.ispresent
 		if(scheduleList.size() != 0) {
 			return scheduleList;
+		}else {
+			return null;
+		}
+	}
+	
+	@Override
+	public Schedule updateSchedule(Long idSchedule, Schedule sche) {
+		Optional<Schedule> _sche = scheduleRepo.findById(idSchedule);
+		
+		if(_sche.isPresent()) {
+			Schedule schedule = _sche.get();
+			if(sche.getFormattedDate() != null) {
+				schedule.setFormattedDate(sche.getFormattedDate());
+			}
+			//quite el Slots
+			if(sche.getDate() != null) {
+				schedule.setDate(sche.getDate());
+			}
+			if(sche.getHealthWorker() != null) {
+				schedule.setHealthWorker(sche.getHealthWorker());
+			}
+			
+			 scheduleRepo.save(schedule);
+			 return schedule;
 		}else {
 			return null;
 		}

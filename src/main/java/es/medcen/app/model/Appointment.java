@@ -3,6 +3,7 @@ package es.medcen.app.model;
 import java.io.Serializable;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -49,7 +50,8 @@ public class Appointment implements Serializable{
 	
 	//Notas, observaciones sobre la cita
 	private String notes;
-	
+	@Column(name="formatted_date")
+	private String formattedDate; //fecha
 
 	//Relacion uno a uno: una cita, un slot
 	
@@ -104,7 +106,14 @@ public class Appointment implements Serializable{
 	}
 	//GETTERS AND SETTERS
 	
-	
+	public String getFormattedDate() {
+		return formattedDate;
+	}
+
+	public void setFormattedDate(String formattedDate) {
+		this.formattedDate = formattedDate;
+	}
+
 	
 	public Long getId() {
 		return id;
